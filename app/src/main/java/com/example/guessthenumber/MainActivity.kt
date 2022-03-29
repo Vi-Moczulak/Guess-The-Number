@@ -155,5 +155,7 @@ class MainActivity : AppCompatActivity() {
         val sharedScore = this.getSharedPreferences("com.example.myapplication.shared",0)
         score = sharedScore.getInt("score", 0)
     }
+
+
 }
 
