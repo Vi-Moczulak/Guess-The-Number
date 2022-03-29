@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Guess The Number</string>
+    <string name="guess_the_number">Guess The Number!</string>
+    <string name="title_activity_zapowiedz">Zapowiedz</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+</resources>
