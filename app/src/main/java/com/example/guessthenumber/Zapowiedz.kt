@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.guessthenumber.databinding.ActivityZapowiedzBinding
+import com.example.guessthenumber.ui.login.LoginActivity
 
 
 /**
@@ -93,7 +94,7 @@ class Zapowiedz : AppCompatActivity() {
 
 
         Handler().postDelayed({
-            val i = Intent(this@Zapowiedz, MainActivity::class.java)
+            val i = Intent(this@Zapowiedz, LoginActivity::class.java)
             startActivity(i)
             finish()
         }, TIME_OUT.toLong())

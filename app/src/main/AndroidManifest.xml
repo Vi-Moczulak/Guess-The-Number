@@ -10,6 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GuessTheNumber">
         <activity
+            android:name=".Ranking"
+            android:exported="false"
+            android:label="@string/title_activit_ranking"/>
+        <activity
             android:name=".ui.login.LoginActivity"
             android:exported="false"
             android:label="@string/title_activity_login" />
@@ -27,7 +31,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
     </application>
 
 </manifest>

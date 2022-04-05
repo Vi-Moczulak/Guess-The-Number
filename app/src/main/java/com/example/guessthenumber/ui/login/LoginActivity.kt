@@ -1,20 +1,25 @@
 package com.example.guessthenumber.ui.login
 
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
-import com.example.guessthenumber.databinding.ActivityLoginBinding
-
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.example.guessthenumber.MainActivity
 import com.example.guessthenumber.R
+import com.example.guessthenumber.Ranking
+import com.example.guessthenumber.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 
@@ -24,6 +29,9 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -31,6 +39,19 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.password
         val login = binding.login
         val loading = binding.loading
+
+        val rankBB = findViewById<TextView>(R.id.button_ranking_list)
+
+        rankBB.setOnClickListener {
+            println("button rank")
+            val thread = Thread {
+                runOnUiThread {
+                    val intent = Intent(this, Ranking::class.java)
+                    startActivity(intent)
+                }
+            }
+            thread.start()
+        }
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
@@ -95,6 +116,8 @@ class LoginActivity : AppCompatActivity() {
                 loading.visibility = View.VISIBLE
                 loginViewModel.login(username.text.toString(), password.text.toString())
             }
+
+
         }
     }
 
@@ -102,6 +125,14 @@ class LoginActivity : AppCompatActivity() {
         val welcome = getString(R.string.welcome)
         val displayName = model.displayName
         // TODO : initiate successful logged in experience
+        val thread = Thread {
+            runOnUiThread {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        thread.start()
+
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",

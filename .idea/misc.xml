@@ -5,8 +5,13 @@
       <map>
         <entry key="app/src/main/res/drawable/gs_button.xml" value="0.165" />
         <entry key="app/src/main/res/drawable/ng_button.xml" value="0.362" />
+        <entry key="app/src/main/res/layout-w1240dp/activity_login.xml" value="0.2319277108433735" />
+        <entry key="app/src/main/res/layout-w936dp/activity_login.xml" value="0.2694672131147541" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3114700317382812" />
+        <entry key="app/src/main/res/layout/activity_ranking.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_zapowiedz.xml" value="0.20410156249999997" />
+        <entry key="app/src/main/res/layout/item_user.xml" value="0.3609375" />
       </map>
     </option>
   </component>
@@ -15,5 +20,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.3609375" />
+      </ProjectState>
+    </option>
   </component>
 </project>
