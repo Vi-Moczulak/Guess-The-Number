@@ -3,10 +3,8 @@ package com.example.guessthenumber.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -23,6 +21,7 @@ import com.example.guessthenumber.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 
+
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
 
@@ -38,12 +37,12 @@ class LoginActivity : AppCompatActivity() {
         val username = binding.username
         val password = binding.password
         val login = binding.login
+        val signIn = binding.signin
         val loading = binding.loading
 
         val rankBB = findViewById<TextView>(R.id.button_ranking_list)
 
         rankBB.setOnClickListener {
-            println("button rank")
             val thread = Thread {
                 runOnUiThread {
                     val intent = Intent(this, Ranking::class.java)
@@ -53,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
             thread.start()
         }
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(this))
             .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
@@ -61,6 +60,7 @@ class LoginActivity : AppCompatActivity() {
 
             // disable login button unless both username / password is valid
             login.isEnabled = loginState.isDataValid
+            signIn?.isEnabled = loginState.isDataValid
 
             if (loginState.usernameError != null) {
                 username.error = getString(loginState.usernameError)
@@ -116,6 +116,10 @@ class LoginActivity : AppCompatActivity() {
                 loading.visibility = View.VISIBLE
                 loginViewModel.login(username.text.toString(), password.text.toString())
             }
+            signIn?.setOnClickListener {
+                loading.visibility = View.VISIBLE
+                loginViewModel.signIn(username.text.toString(), password.text.toString())
+            }
 
 
         }
@@ -128,6 +132,7 @@ class LoginActivity : AppCompatActivity() {
         val thread = Thread {
             runOnUiThread {
                 val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("user",model.displayName)
                 startActivity(intent)
             }
         }
@@ -135,9 +140,16 @@ class LoginActivity : AppCompatActivity() {
 
         Toast.makeText(
             applicationContext,
-            "$welcome $displayName",
+            "$welcome $displayName !",
             Toast.LENGTH_LONG
         ).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loginViewModel.logout()
+        binding.username.setText("")
+        binding.password.setText("")
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {

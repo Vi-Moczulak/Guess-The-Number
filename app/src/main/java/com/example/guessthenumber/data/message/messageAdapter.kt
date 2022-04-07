@@ -15,10 +15,12 @@ class messageAdapter(
         val user = itemView.findViewById<TextView>(R.id.text_user_name)
         val score = itemView.findViewById<TextView>(R.id.text_user_points)
 
-        fun bind(curMessage: message) {
-            idr.text = curMessage.id_rank
-            user.text = curMessage.displayName
-            score.text = curMessage.score.toString()
+        fun bind(curMessage: message,poz:Int) {
+            //println(poz)
+            idr.text= poz.toString()
+            user.text ="User: "+ curMessage.displayName
+            score.text = "Score: "+curMessage.score.toString()
+
         }
     }
 
@@ -35,7 +37,7 @@ class messageAdapter(
 
     override fun onBindViewHolder(holder: messageViewHolder, position: Int) {
         val curMessage = messages[position]
-        holder.bind(curMessage)
+        holder.bind(curMessage,position+1)
     }
 
     override fun getItemCount(): Int {

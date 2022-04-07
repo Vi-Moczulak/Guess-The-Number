@@ -29,6 +29,25 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
+    fun signIn(username: String, password: String) {
+        // can be launched in a separate asynchronous job
+        val result = loginRepository.signIn(username, password)
+
+        if (result is Result.Success) {
+            _loginResult.value =
+                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
+                this.login(username,password)
+        } else {
+            _loginResult.value = LoginResult(error = R.string.login_failed)
+        }
+    }
+
+    fun logout() {
+        // can be launched in a separate asynchronous job
+        val result = loginRepository.logout()
+
+    }
+
     fun loginDataChanged(username: String, password: String) {
         if (!isUserNameValid(username)) {
             _loginForm.value = LoginFormState(usernameError = R.string.invalid_username)

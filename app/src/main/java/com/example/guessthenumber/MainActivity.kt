@@ -2,13 +2,20 @@ package com.example.guessthenumber
 
 import android.app.AlertDialog
 import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.guessthenumber.DB.DBHelper
+import com.example.guessthenumber.data.message.message
+import com.example.guessthenumber.ui.login.LoginActivity
+import com.example.guessthenumber.ui.login.LoginViewModel
+import com.example.guessthenumber.ui.login.LoginViewModelFactory
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -16,22 +23,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var number_input: EditText
     private lateinit var guess_button: Button
     private lateinit var new_game_button: Button
-    private lateinit var reset_score: Button
+    private lateinit var ranking_button: Button
     private lateinit var the_number: TextView
     private lateinit var return_msg: TextView
     private lateinit var score_text: TextView
     private lateinit var count_try_text: TextView
+    private lateinit var logOut_button:Button
 
 
     private var user_number: Int = 0
     private var score: Int = 0
     private var count_try: Int = 0
 
+    private lateinit var loginViewModel: LoginViewModel
+    internal lateinit var db: DBHelper
 
     var guess = -1;
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        getRecord()
+
+        val intern = getIntent()
+        val user=intent.getStringExtra("user")
+
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -41,8 +55,9 @@ class MainActivity : AppCompatActivity() {
         return_msg = findViewById(R.id.retun_msg)
         score_text = findViewById(R.id.score_text)
         new_game_button = findViewById(R.id.new_game_button)
-        reset_score = findViewById(R.id.reset_score)
+        ranking_button = findViewById(R.id.button_ranking)
         count_try_text = findViewById(R.id.count_try_text)
+        logOut_button = findViewById(R.id.LogOut)
 
         var randomValue = Random.nextInt(0, 20)
         the_number.text = randomValue.toString()
@@ -53,7 +68,9 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton("OK"){ dialogInterface: DialogInterface, i: Int ->}
         val dialog: AlertDialog = builder.create()
 
-
+        db = DBHelper(this)
+        getRecord()
+        score_text.text = "Score: " + score.toString()
 
         guess_button.setOnClickListener {
             try {
@@ -104,6 +121,9 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 if (count_try == 10) {
+                    val new = message(user,score)
+                    db.addMessage(new)
+
                     return_msg.text = "Restart"
                     score_text.text = "Score: 0"
                     score = 0
@@ -116,29 +136,45 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "You lose!", Toast.LENGTH_LONG).show()
                     the_number.text = randomValue.toString()
 
+
+
+
+
                 }
                 }
             } catch (e: NumberFormatException) {
             }
         }
         new_game_button.setOnClickListener {
+
             count_try = 0
             count_try_text.text="Try: "+count_try.toString()
 
             randomValue = Random.nextInt(0, 20)
             number_input.getText().clear();
             return_msg.text = "New Game!"
+            print(user)
 
         }
-        reset_score.setOnClickListener {
+        ranking_button.setOnClickListener {
 
-            score_text.text = "Score: 0"
-            count_try = 0
-            count_try_text.text="Try: "+count_try.toString()
+            val thread = Thread {
+                runOnUiThread {
+                    val intent = Intent(this, Ranking::class.java)
+                    startActivity(intent)
+                }
+            }
+            thread.start()
+        }
 
-            randomValue = Random.nextInt(0, 20)
-            number_input.getText().clear();
-            return_msg.text = "Reset!"
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(LoginActivity()))
+            .get(LoginViewModel::class.java)
+
+        logOut_button.setOnClickListener{
+            loginViewModel.logout()
+            finish()
+
+
         }
 
 

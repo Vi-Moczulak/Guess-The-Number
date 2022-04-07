@@ -2,6 +2,7 @@ package com.example.guessthenumber
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.guessthenumber.DB.DBHelper
@@ -17,18 +18,20 @@ class Ranking : AppCompatActivity() {
         setContentView(R.layout.activity_ranking)
         db = DBHelper(this)
 
-        var new = message("1","VI","3")
-        db.addMessage(new)
+        //var new = message("vi",3)
+        //db.addMessage(new)
 
         val listMessage = db.allMessage
         listMessage.reversed()
-        messageAdapter = messageAdapter(listMessage)
+            messageAdapter = messageAdapter(listMessage)
+            val messageList = findViewById<RecyclerView>(R.id.recyclerView)
+            messageList.adapter = messageAdapter
+            messageList.layoutManager = LinearLayoutManager(this)
 
-        val messageList = findViewById<RecyclerView>(R.id.recyclerView)
-        messageList.adapter = messageAdapter
-        messageList.layoutManager = LinearLayoutManager(this)
-
-
+        val button_return = findViewById<TextView>(R.id.button_return)
+        button_return.setOnClickListener {
+            finish()
+        }
 
     }
 }

@@ -1,7 +1,6 @@
 package com.example.guessthenumber.data.message
 
-class message (
-    var id_rank: String,
-    var displayName: String,
-    var score: String
+class message(
+    var displayName: String?,
+    var score: Int
 )

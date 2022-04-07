@@ -1,31 +1,63 @@
 package com.example.guessthenumber.data
 
+import com.example.guessthenumber.DB.DBHelper_Users
 import com.example.guessthenumber.data.model.LoggedInUser
+import com.example.guessthenumber.ui.login.LoginActivity
 import java.io.IOException
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
-class LoginDataSource {
+class LoginDataSource(private val activity: LoginActivity) {
+
+    //private val shared = activity.getSharedPreferences("com.example.testing.shared", 0)
 
     fun login(username: String, password: String): Result<LoggedInUser> {
-        try {
-            // TODO: handle loggedInUser authentication
-            val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), username,password )
-            return Result.Success(fakeUser)
+        val db = DBHelper_Users(activity.applicationContext)
+        return try {
+            val tmp = LoggedInUser(username, password)
+            if (db.validate(tmp)) {
+                //shared.edit()
+                //  .putString("username",tmp.displayName)
+                //    .putString("password",tmp.password)
+                // .apply()
+                Result.Success(tmp)
+            } else {
+                return Result.Error(IOException("Error logging in"))
+            }
+
         } catch (e: Throwable) {
-            return Result.Error(IOException("Error logging in", e))
+            Result.Error(IOException("Error logging in", e))
+        } finally {
+            db.close()
         }
     }
 
-    fun logout(): Result<LoggedInUser> {
-        // TODO: revoke authentication
-        try {
-            // TODO: handle loggedInUser authentication
-            val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), "loggingOut", "loggingOut")
-            return Result.Success(fakeUser)
+    fun signIn(username: String, password: String): Result<LoggedInUser> {
+
+        val db = DBHelper_Users(activity.applicationContext)
+
+        return try {
+            val tmp = LoggedInUser(username, password)
+            if (db.validate(tmp)) {
+                Result.Error(IOException("Error registering in"))
+            } else {
+                db.addUser(tmp)
+                Result.Success(tmp)
+            }
         } catch (e: Throwable) {
-            return Result.Error(IOException("Error logging out", e))
+            Result.Error(IOException("Error registering in", e))
         }
+    }
+
+    fun logout() {
+        /*
+        shared.edit()
+            .remove("username")
+            .remove("password")
+            .apply()
+
+         */
+
     }
 }
