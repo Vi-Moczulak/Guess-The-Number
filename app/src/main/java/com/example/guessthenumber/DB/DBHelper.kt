@@ -37,7 +37,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(
         @SuppressLint("Range")
         get(){
             val listUser = ArrayList<message>()
-            val selectQuery = "SELECT * FROM $TABLE_NAME"
+            val selectQuery = "SELECT * FROM $TABLE_NAME ORDER BY $COL_score DESC LIMIT 10"
             val db = this.writableDatabase
             val cursor =  db.rawQuery(selectQuery, null)
             if(cursor.moveToFirst()){

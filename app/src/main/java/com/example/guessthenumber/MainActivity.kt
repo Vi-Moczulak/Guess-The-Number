@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.guessthenumber.DB.DBHelper
+import com.example.guessthenumber.DB.DBHelper_Users
 import com.example.guessthenumber.data.message.message
 import com.example.guessthenumber.ui.login.LoginActivity
 import com.example.guessthenumber.ui.login.LoginViewModel
@@ -28,22 +29,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var return_msg: TextView
     private lateinit var score_text: TextView
     private lateinit var count_try_text: TextView
-    private lateinit var logOut_button:Button
+    private lateinit var logOut_button: Button
 
 
     private var user_number: Int = 0
     private var score: Int = 0
     private var count_try: Int = 0
 
-    private lateinit var loginViewModel: LoginViewModel
+    //private lateinit var loginViewModel: LoginViewModel
     internal lateinit var db: DBHelper
+    internal lateinit var db_user: DBHelper_Users
+
 
     var guess = -1;
     override fun onCreate(savedInstanceState: Bundle?) {
 
 
-        val intern = getIntent()
-        val user=intent.getStringExtra("user")
+        var user = " "
+        user = intent.getStringExtra("user").toString()
 
 
         super.onCreate(savedInstanceState)
@@ -65,82 +68,85 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this@MainActivity)
         builder.setTitle("Win!")
         builder.setMessage("You guessed!")
-        builder.setPositiveButton("OK"){ dialogInterface: DialogInterface, i: Int ->}
+        builder.setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int -> }
         val dialog: AlertDialog = builder.create()
 
         db = DBHelper(this)
-        getRecord()
+        db_user = DBHelper_Users(this)
+
+        score = db_user.getScore(user)
+        println("Score: "+score)
         score_text.text = "Score: " + score.toString()
 
         guess_button.setOnClickListener {
             try {
 
                 user_number = number_input.getText().toString().toInt()
-                if (user_number>20){
+                if (user_number > 20) {
                     Toast.makeText(applicationContext, "Max 20", Toast.LENGTH_LONG).show()
                     number_input.getText().clear();
-                }else{
-                number_input.getText().clear();
-
-                count_try++
-                count_try_text.text="Try: "+count_try.toString()
-                return_msg.text = ""
-
-
-                if (user_number == randomValue) {
-                    //1 razem - 5pkt, za 2 do 4 - 3pkt, za 5 do 6 - 2pkt, za 7 do 10 - 1pk
-                    Log.d("myTag", "Tak");
-                    score += if (count_try == 1) {
-                        5
-                    } else if (count_try < 5) {
-                        3
-                    } else if (count_try < 7) {
-                        2
-                    } else {
-                        1
-                    }
-                    score_text.text = "Score: " + score.toString()
-                    count_try = 0
-                    count_try_text.text="Try: "+count_try.toString()
-
-                    randomValue = Random.nextInt(0, 20)
+                } else {
                     number_input.getText().clear();
-                    //return_msg.text = "You guessed!"
-                    setRecord()
-                    dialog.show()
 
-
-                    the_number.text = randomValue.toString()
-
-                } else if (user_number > randomValue) {
-                    //return_msg.text = "Too high!"
-                    Toast.makeText(applicationContext, "Too high!", Toast.LENGTH_LONG).show()
-                } else if (user_number < randomValue) {
-                    //return_msg.text = "Too low!"
-                    Toast.makeText(applicationContext, "Too low!", Toast.LENGTH_LONG).show()
-
-                }
-                if (count_try == 10) {
-                    val new = message(user,score)
-                    db.addMessage(new)
-
-                    return_msg.text = "Restart"
-                    score_text.text = "Score: 0"
-                    score = 0
-                    count_try = 0
+                    count_try++
                     count_try_text.text = "Try: " + count_try.toString()
-
-                    randomValue = Random.nextInt(0, 20)
-                    number_input.getText().clear();
-
-                    Toast.makeText(applicationContext, "You lose!", Toast.LENGTH_LONG).show()
-                    the_number.text = randomValue.toString()
+                    return_msg.text = ""
 
 
+                    if (user_number == randomValue) {
+                        //1 razem - 5pkt, za 2 do 4 - 3pkt, za 5 do 6 - 2pkt, za 7 do 10 - 1pk
+                        Log.d("myTag", "Tak");
+                        score += if (count_try == 1) {
+                            5
+                        } else if (count_try < 5) {
+                            3
+                        } else if (count_try < 7) {
+                            2
+                        } else {
+                            1
+                        }
+                        db_user.updateScore(user, score)
+
+                        score_text.text = "Score: " + score.toString()
+                        count_try = 0
+                        count_try_text.text = "Try: " + count_try.toString()
+
+                        randomValue = Random.nextInt(0, 20)
+                        number_input.getText().clear();
+                        //return_msg.text = "You guessed!"
+                        //setRecord()
+                        dialog.show()
 
 
+                        the_number.text = randomValue.toString()
 
-                }
+                    } else if (user_number > randomValue) {
+                        //return_msg.text = "Too high!"
+                        Toast.makeText(applicationContext, "Too high!", Toast.LENGTH_LONG).show()
+                    } else if (user_number < randomValue) {
+                        //return_msg.text = "Too low!"
+                        Toast.makeText(applicationContext, "Too low!", Toast.LENGTH_LONG).show()
+
+                    }
+                    if (count_try == 10) {
+                        val new = message(user, score)
+                        db.addMessage(new)
+
+                        return_msg.text = "Restart"
+                        score_text.text = "Score: 0"
+                        score = 0
+                        count_try = 0
+                        count_try_text.text = "Try: " + count_try.toString()
+
+                        db_user.updateScore(user, score)
+                        randomValue = Random.nextInt(0, 20)
+                        number_input.getText().clear();
+
+                        Toast.makeText(applicationContext, "You lose!", Toast.LENGTH_LONG).show()
+                        the_number.text = randomValue.toString()
+
+
+                    }
                 }
             } catch (e: NumberFormatException) {
             }
@@ -148,12 +154,11 @@ class MainActivity : AppCompatActivity() {
         new_game_button.setOnClickListener {
 
             count_try = 0
-            count_try_text.text="Try: "+count_try.toString()
+            count_try_text.text = "Try: " + count_try.toString()
 
             randomValue = Random.nextInt(0, 20)
             number_input.getText().clear();
             return_msg.text = "New Game!"
-            print(user)
 
         }
         ranking_button.setOnClickListener {
@@ -167,29 +172,12 @@ class MainActivity : AppCompatActivity() {
             thread.start()
         }
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(LoginActivity()))
-            .get(LoginViewModel::class.java)
 
-        logOut_button.setOnClickListener{
-            loginViewModel.logout()
+        logOut_button.setOnClickListener {
             finish()
-
-
         }
 
 
-
-    }
-    fun setRecord(){
-        val sharedScore = this.getSharedPreferences("com.example.myapplication.shared",0)
-        val edit = sharedScore.edit()
-        edit.putInt("score", score)
-        edit.apply()
-    }
-
-    fun getRecord(){
-        val sharedScore = this.getSharedPreferences("com.example.myapplication.shared",0)
-        score = sharedScore.getInt("score", 0)
     }
 
 

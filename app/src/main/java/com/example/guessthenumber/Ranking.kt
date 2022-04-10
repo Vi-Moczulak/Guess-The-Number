@@ -35,11 +35,3 @@ class Ranking : AppCompatActivity() {
 
     }
 }
-
-/*
-for (a in 1..10) {
-            val new = messageAdapter()
-            messageAdapter.addMessage(new)
-
-        }
-*/

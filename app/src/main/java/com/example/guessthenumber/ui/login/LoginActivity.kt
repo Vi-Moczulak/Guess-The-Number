@@ -2,6 +2,7 @@ package com.example.guessthenumber.ui.login
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var shared : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +35,8 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        shared = getSharedPreferences("com.example.guessthenumber.shared", 0)
 
         val username = binding.username
         val password = binding.password
@@ -54,6 +58,16 @@ class LoginActivity : AppCompatActivity() {
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory(this))
             .get(LoginViewModel::class.java)
+
+        if (shared.contains("username") && shared.contains("password")) {
+            loginViewModel.login(
+                shared.getString("username", "DEFAULT")!!,
+                shared.getString("password", "DEFAULT")!!
+            )
+
+
+        }
+
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -83,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK)
 
             //Complete and destroy login activity once successful
-            finish()
+            //finish()
         })
 
         username.afterTextChanged {
@@ -130,11 +144,10 @@ class LoginActivity : AppCompatActivity() {
         val displayName = model.displayName
         // TODO : initiate successful logged in experience
         val thread = Thread {
-            runOnUiThread {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.putExtra("user",model.displayName)
                 startActivity(intent)
-            }
+
         }
         thread.start()
 
@@ -171,3 +184,4 @@ fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
     })
 }
+
